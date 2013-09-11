@@ -158,13 +158,12 @@ module.exports = function (grunt) {
 
             _.each(this.modules, function (module) {
                 xml += '\t<testsuite'
-                    + ' name="' + this.escape(this.classname) + '"'
+                    + ' name="' + this.escape(module.name) + '"'
                     + ' errors="' + module.errored + '"'
                     + ' failures="' + module.failed + '"'
                     + ' tests="' + module.tests.length + '">\n';
                 _.each(module.tests, function (test) {
                     xml += '\t\t<testcase'
-                        + ' classname="' + this.escape(this.classname) + '"'
                         + ' name="' + this.escape(module.name + ": " + test.name) + '"'
                         + ' assertions="' + test.total + '">\n';
                     _.each(test.logs, function (data) {
