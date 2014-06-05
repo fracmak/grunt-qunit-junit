@@ -114,13 +114,14 @@ module.exports = function (grunt) {
             }
         },
 
-        handleTestDone: function (name, failed, passed, total) {
+        handleTestDone: function (name, failed, passed, total, duration) {
             this.tests.push({
                 name: name,
                 errored: this.currentErrors,
                 failed: failed - this.currentErrors,
                 passed: passed,
                 total: total,
+                duration: duration || 0,
                 logs: this.currentLogs
             });
 
@@ -129,9 +130,11 @@ module.exports = function (grunt) {
         },
 
         handleModuleDone: function (name, failed, passed, total) {
-            var totalErrors = 0;
+            var totalErrors = 0,
+                duration = 0;
             this.tests.forEach(function (test) {
                 totalErrors += test.errored;
+                duration += test.duration;
             });
             var data = {
                 name: name,
@@ -139,6 +142,7 @@ module.exports = function (grunt) {
                 failed: failed - totalErrors,
                 passed: passed,
                 total: total,
+                duration: duration,
                 tests: this.tests
             };
             this.modules.push(data);
@@ -161,10 +165,12 @@ module.exports = function (grunt) {
                     + ' name="' + this.escape(module.name) + '"'
                     + ' errors="' + module.errored + '"'
                     + ' failures="' + module.failed + '"'
+                    + ' time="' + module.duration + '"'
                     + ' tests="' + module.tests.length + '">\n';
                 _.each(module.tests, function (test) {
                     xml += '\t\t<testcase'
                         + ' name="' + this.escape(module.name + ": " + test.name) + '"'
+                        + ' time="' + test.duration + '"'
                         + ' assertions="' + test.total + '">\n';
                     _.each(test.logs, function (data) {
                         xml += '\t\t\t<' + data.type + ' type="failed" message="'
@@ -232,3 +238,5 @@ module.exports = function (grunt) {
         grunt.log.ok("XML reports will be written to " + options.dest);
     });
 };
+
+
